@@ -1,0 +1,226 @@
+@import "tailwindcss";
+
+@theme inline {
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@theme {
+  --text-2xs: 0.625rem;
+  --text-2xs--line-height: calc(1 / 0.625);
+
+  /* Pastel canvases behind the product shots */
+  --color-peach: #fbe4d6;
+  --color-sky: #e2ecf8;
+  --color-lilac: #ebe6f6;
+  --color-mint: #e1efe5;
+  --color-butter: #f7efd6;
+  --color-rose: #f8e1e4;
+  --color-sand: #f2eee6;
+  --color-stone: #ebeae6;
+  --color-clay: #d97757;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
+
+  ::selection {
+    background: #fde68a;
+    color: #000;
+  }
+}
+
+@layer components {
+  .wordmark {
+    font-family: var(--font-serif);
+    font-weight: 900;
+    font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 144;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .serif-num {
+    font-family: var(--font-serif);
+    font-weight: 800;
+    font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 96;
+    letter-spacing: -0.02em;
+    font-variant-numeric: lining-nums;
+  }
+
+  /* Links in running text: soft grey underline that darkens on hover. */
+  .u-link {
+    text-decoration-line: underline;
+    text-decoration-color: #dcdcdc;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 150ms ease;
+  }
+
+  .u-link:hover {
+    text-decoration-color: currentColor;
+  }
+
+  .inline-code {
+    font-family: var(--font-mono);
+    font-size: 0.84em;
+    letter-spacing: 0;
+    padding: 0.1em 0.35em;
+    border-radius: 0.3em;
+    background: rgb(0 0 0 / 0.05);
+    white-space: nowrap;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .u-link {
+      text-decoration-color: #3f3f46;
+    }
+
+    .u-link:hover {
+      text-decoration-color: currentColor;
+    }
+
+    .inline-code {
+      background: rgb(255 255 255 / 0.1);
+    }
+  }
+
+  /* ---------- Product shots ---------- */
+
+  .shot {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    container-type: inline-size;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.04);
+  }
+
+  /* Paper grain, like printed screenshots; sits behind the mock UI. */
+  .grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.3 0 0 0 0 0.22 0 0 0 0 0.16 0 0 0 0.16 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    mix-blend-mode: multiply;
+  }
+
+  /*
+   * Scaled stage: 1u = k% of the shot width (16px on an 800px shot, capped at 16px).
+   * Tailwind's spacing/text/radius tokens are re-pointed at u, so regular utilities
+   * inside a stage scale together like an image.
+   */
+  .shot-stage {
+    --k: 2;
+    --u: min(calc(var(--k) * 1cqw), 16px);
+    --spacing: calc(var(--u) * 0.25);
+    --text-2xs: calc(var(--u) * 0.625);
+    --text-xs: calc(var(--u) * 0.75);
+    --text-sm: calc(var(--u) * 0.875);
+    --text-base: var(--u);
+    --text-lg: calc(var(--u) * 1.125);
+    --text-xl: calc(var(--u) * 1.25);
+    --text-2xl: calc(var(--u) * 1.5);
+    --text-3xl: calc(var(--u) * 1.875);
+    --text-4xl: calc(var(--u) * 2.25);
+    --text-5xl: calc(var(--u) * 3);
+    --radius-sm: calc(var(--u) * 0.25);
+    --radius-md: calc(var(--u) * 0.375);
+    --radius-lg: calc(var(--u) * 0.5);
+    --radius-xl: calc(var(--u) * 0.75);
+    --radius-2xl: var(--u);
+    position: relative;
+    height: 100%;
+    color: #141414;
+    font-size: var(--u);
+    line-height: 1.45;
+    letter-spacing: -0.01em;
+  }
+
+  .shot[data-size="half"] > .shot-stage {
+    --k: 4;
+  }
+
+  @container (width < 36rem) {
+    .shot:not([data-size="half"]) > .shot-stage {
+      --k: 2.9;
+    }
+  }
+
+  /* ---------- Code ---------- */
+
+  .code {
+    margin: 0;
+    overflow-x: auto;
+    color: #1f2328;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.75;
+    letter-spacing: 0;
+    font-variant-ligatures: none;
+    scrollbar-width: thin;
+  }
+
+  .code > code {
+    display: block;
+    min-width: max-content;
+  }
+
+  .code-line {
+    display: flex;
+    padding: 0 1.25rem 0 1rem;
+  }
+
+  .code-line--add {
+    background: #e6f4ea;
+    box-shadow: inset 3px 0 0 #34a15a;
+  }
+
+  .code-ln {
+    flex: none;
+    width: 1.5rem;
+    margin-right: 1rem;
+    color: #b4b4b4;
+    text-align: right;
+    user-select: none;
+  }
+
+  .code-src {
+    white-space: pre;
+  }
+
+  .shot-stage .code {
+    font-size: calc(var(--u) * 0.74);
+    line-height: 1.6;
+  }
+
+  .shot-stage .code-line {
+    padding-inline: 1.35em;
+  }
+
+  @media (max-width: 640px) {
+    .code {
+      font-size: 12px;
+    }
+  }
+
+  .tok-kw { color: #c0306b; }
+  .tok-str { color: #177245; }
+  .tok-num,
+  .tok-var,
+  .tok-flag { color: #b35c00; }
+  .tok-com { color: #9aa0a6; font-style: italic; }
+  .tok-fn { color: #2f5bd3; }
+  .tok-prop { color: #7445c7; }
+  .tok-builtin { color: #0f7285; }
+}
